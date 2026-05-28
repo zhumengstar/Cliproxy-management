@@ -16,6 +16,8 @@ Open `http://localhost:4173`.
 npm test
 ```
 
+The current statistics view reads the four local mock source types under `mock-data/CLIProxyAPI`: structured usage JSONL, auth JSON files, `config.yaml`, and raw request logs. Account pool mock API files are kept as UI/reference fixtures for later account pool workflows.
+
 ## Docs
 
 - [Data sources and metrics](docs/data-sources-and-metrics.md)

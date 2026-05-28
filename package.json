@@ -5,6 +5,6 @@
   "type": "module",
   "scripts": {
     "start": "node scripts/dev-server.mjs",
-    "test": "node tests/data.test.mjs"
+    "test": "node tests/data.test.mjs && node tests/ui-smoke.test.mjs"
   }
 }
