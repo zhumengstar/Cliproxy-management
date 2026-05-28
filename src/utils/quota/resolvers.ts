@@ -79,9 +79,9 @@ export function resolveCodexPlanType(file: AuthFileItem): string | null {
 }
 
 export function extractGeminiCliProjectId(value: unknown): string | null {
-  if (typeof value !== 'string') return null;
+  if (typeof value !== 'string') return normalizeStringValue(value);
   const matches = Array.from(value.matchAll(/\(([^()]+)\)/g));
-  if (matches.length === 0) return null;
+  if (matches.length === 0) return normalizeStringValue(value);
   const candidate = matches[matches.length - 1]?.[1]?.trim();
   return candidate ? candidate : null;
 }
@@ -97,9 +97,17 @@ export function resolveGeminiCliProjectId(file: AuthFileItem): string | null {
       : null;
 
   const candidates = [
+    file.project_id,
+    file.projectId,
+    file['project_id'],
+    file['projectId'],
     file.account,
     file['account'],
+    metadata?.project_id,
+    metadata?.projectId,
     metadata?.account,
+    attributes?.project_id,
+    attributes?.projectId,
     attributes?.account
   ];
 

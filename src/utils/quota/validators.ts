@@ -36,7 +36,8 @@ export function isCodexFile(file: AuthFileItem): boolean {
 }
 
 export function isGeminiCliFile(file: AuthFileItem): boolean {
-  return resolveAuthProvider(file) === 'gemini-cli';
+  const provider = resolveAuthProvider(file);
+  return provider === 'gemini-cli' || provider === 'gemini';
 }
 
 export function isKimiFile(file: AuthFileItem): boolean {

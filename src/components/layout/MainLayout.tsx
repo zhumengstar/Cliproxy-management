@@ -13,21 +13,10 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 import { PageTransition } from '@/components/common/PageTransition';
 import { MainRoutes } from '@/router/MainRoutes';
-import {
-  IconSidebarAuthFiles,
-  IconSidebarAccountPool,
-  IconSidebarConfig,
-  IconSidebarDashboard,
-  IconSidebarLogs,
-  IconSidebarOauth,
-  IconSidebarProviders,
-  IconSidebarQuota,
-  IconSidebarSystem,
-} from '@/components/ui/icons';
+import { IconSidebarAccountPool } from '@/components/ui/icons';
 import { INLINE_LOGO_JPEG } from '@/assets/logoInline';
 import {
   useAuthStore,
-  useConfigStore,
   useLanguageStore,
   useNotificationStore,
   useThemeStore,
@@ -38,14 +27,6 @@ import { isSupportedLanguage } from '@/utils/language';
 import type { Theme } from '@/types';
 
 const sidebarIcons: Record<string, ReactNode> = {
-  dashboard: <IconSidebarDashboard size={18} />,
-  aiProviders: <IconSidebarProviders size={18} />,
-  authFiles: <IconSidebarAuthFiles size={18} />,
-  oauth: <IconSidebarOauth size={18} />,
-  quota: <IconSidebarQuota size={18} />,
-  config: <IconSidebarConfig size={18} />,
-  logs: <IconSidebarLogs size={18} />,
-  system: <IconSidebarSystem size={18} />,
   accountPool: <IconSidebarAccountPool size={18} />,
 };
 
@@ -214,9 +195,6 @@ export function MainLayout() {
   const { showNotification } = useNotificationStore();
   const logout = useAuthStore((state) => state.logout);
 
-  const fetchConfig = useConfigStore((state) => state.fetchConfig);
-  const clearCache = useConfigStore((state) => state.clearCache);
-
   const theme = useThemeStore((state) => state.theme);
   const setTheme = useThemeStore((state) => state.setTheme);
   const language = useLanguageStore((state) => state.language);
@@ -377,31 +355,8 @@ export function MainLayout() {
     [setLanguage]
   );
 
-  useEffect(() => {
-    fetchConfig().catch(() => {
-      // ignore initial failure; login flow会提示
-    });
-  }, [fetchConfig]);
-
   const navItems = [
-    { path: '/', label: t('nav.dashboard'), icon: sidebarIcons.dashboard },
-    { path: '/config', label: t('nav.config_management'), icon: sidebarIcons.config },
-    { path: '/ai-providers', label: t('nav.ai_providers'), icon: sidebarIcons.aiProviders },
-    { path: '/auth-files', label: t('nav.auth_files'), icon: sidebarIcons.authFiles },
-    { path: '/oauth', label: t('nav.oauth', { defaultValue: 'OAuth' }), icon: sidebarIcons.oauth },
-    { path: '/quota', label: t('nav.quota_management'), icon: sidebarIcons.quota },
-    { path: '/system', label: t('nav.system_info'), icon: sidebarIcons.system },
-    {
-      path: '/usage-records',
-      label: t('nav.usage_records', { defaultValue: '使用记录' }),
-      icon: sidebarIcons.logs,
-    },
     { path: '/account-pool', label: t('nav.account_pool'), icon: sidebarIcons.accountPool },
-    {
-      path: '/sub2api-import',
-      label: t('nav.sub2api_import', { defaultValue: 'Sub2 转 CPA' }),
-      icon: sidebarIcons.accountPool,
-    },
   ];
   const navOrder = navItems.map((item) => item.path);
   const getRouteOrder = (pathname: string) => {
@@ -460,11 +415,7 @@ export function MainLayout() {
   }, []);
 
   const handleRefreshAll = async () => {
-    clearCache();
-    const results = await Promise.allSettled([
-      fetchConfig(undefined, true),
-      triggerHeaderRefresh(),
-    ]);
+    const results = await Promise.allSettled([triggerHeaderRefresh()]);
     const rejected = results.find((result) => result.status === 'rejected');
     if (rejected && rejected.status === 'rejected') {
       const reason = rejected.reason;

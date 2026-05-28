@@ -44,6 +44,123 @@ const fetchMockText = async (path: string): Promise<string> => {
   return response.text();
 };
 
+const buildMockApiCallResult = (body: unknown, statusCode = 200) => ({
+  status_code: statusCode,
+  header: {},
+  body: typeof body === 'string' ? body : JSON.stringify(body),
+});
+
+const buildMockResetAt = (hoursFromNow: number): string =>
+  new Date(Date.now() + hoursFromNow * 60 * 60 * 1000).toISOString();
+
+const handleLocalMockApiCall = (data?: unknown): unknown => {
+  const payload = (data && typeof data === 'object' ? data : {}) as Record<string, unknown>;
+  const url = String(payload.url ?? '').toLowerCase();
+  const authName = String(payload.authName ?? payload.auth_name ?? '').toLowerCase();
+  const authIndex = String(payload.authIndex ?? payload.auth_index ?? '').toLowerCase();
+  const identity = `${authName} ${authIndex} ${url}`;
+
+  if (identity.includes('chatgpt.com') || identity.includes('codex')) {
+    return buildMockApiCallResult({
+      plan_type: 'plus',
+      rate_limit: {
+        allowed: true,
+        primary_window: {
+          used_percent: 28,
+          limit_window_seconds: 18000,
+          reset_after_seconds: 7200,
+        },
+        secondary_window: {
+          used_percent: 18,
+          limit_window_seconds: 604800,
+          reset_after_seconds: 172800,
+        },
+      },
+      code_review_rate_limit: {
+        allowed: true,
+        primary_window: {
+          used_percent: 12,
+          limit_window_seconds: 18000,
+          reset_after_seconds: 5400,
+        },
+        secondary_window: {
+          used_percent: 9,
+          limit_window_seconds: 604800,
+          reset_after_seconds: 259200,
+        },
+      },
+    });
+  }
+
+  if (url.includes('/profile') && (identity.includes('anthropic') || identity.includes('claude'))) {
+    return buildMockApiCallResult({
+      account: {
+        email: 'claude-user@example.com',
+        has_claude_pro: true,
+        has_claude_max: false,
+      },
+      organization: {
+        organization_type: 'claude_pro',
+        subscription_status: 'active',
+      },
+    });
+  }
+
+  if (identity.includes('anthropic') || identity.includes('claude')) {
+    return buildMockApiCallResult({
+      five_hour: { utilization: 34, resets_at: buildMockResetAt(2) },
+      seven_day: { utilization: 45, resets_at: buildMockResetAt(96) },
+      seven_day_sonnet: { utilization: 31, resets_at: buildMockResetAt(72) },
+      seven_day_opus: { utilization: 62, resets_at: buildMockResetAt(72) },
+      extra_usage: {
+        is_enabled: true,
+        monthly_limit: 10000,
+        used_credits: 1800,
+        utilization: 18,
+      },
+    });
+  }
+
+  if (url.includes('loadcodeassist')) {
+    return buildMockApiCallResult({
+      currentTier: {
+        id: 'free-tier',
+        availableCredits: [{ creditType: 'GOOGLE_ONE_AI', creditAmount: 0 }],
+      },
+    });
+  }
+
+  if (identity.includes('cloudcode-pa.googleapis.com') || identity.includes('gemini')) {
+    return buildMockApiCallResult({
+      buckets: [
+        {
+          modelId: 'gemini-2.5-flash-lite',
+          tokenType: 'requests',
+          remainingFraction: 0.82,
+          remainingAmount: 820,
+          resetTime: buildMockResetAt(12),
+        },
+        {
+          modelId: 'gemini-3-flash-preview',
+          tokenType: 'requests',
+          remainingFraction: 0.64,
+          remainingAmount: 320,
+          resetTime: buildMockResetAt(12),
+        },
+        {
+          modelId: 'gemini-3.1-pro-preview',
+          tokenType: 'requests',
+          remainingFraction: 0.51,
+          remainingAmount: 51,
+          resetTime: buildMockResetAt(24),
+        },
+      ],
+    });
+  }
+
+  return buildMockApiCallResult({});
+};
+
 const buildMockAxiosResponse = (data: unknown): AxiosResponse => ({
   data,
   status: 200,
@@ -62,10 +179,16 @@ const resolveMockAuthPath = async (name: string): Promise<string> => {
 };
 
 const handleLocalMockData = async <T,>(method: string, url: string, data?: unknown): Promise<T | undefined> => {
-  if (!isLocalMockMode() || !url.startsWith('/account-pool')) return undefined;
+  if (!isLocalMockMode()) return undefined;
 
   const parsed = normalizeMockUrl(url);
   const pathname = parsed.pathname;
+
+  if (method === 'POST' && pathname === '/api-call') {
+    return handleLocalMockApiCall(data) as T;
+  }
+
+  if (!pathname.startsWith('/account-pool')) return undefined;
 
   if (method === 'GET' && (pathname === '/account-pool/list' || pathname === '/account-pool')) {
     return fetchMockJson<T>(LOCAL_MOCK_ACCOUNT_POOL_LIST);
