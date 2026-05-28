@@ -1,13 +1,9 @@
 import { Suspense, lazy, useEffect } from 'react';
-import { Outlet, RouterProvider, createHashRouter } from 'react-router-dom';
+import { RouterProvider, createHashRouter } from 'react-router-dom';
 import { NotificationContainer } from '@/components/common/NotificationContainer';
 import { ConfirmationModal } from '@/components/common/ConfirmationModal';
-import { ProtectedRoute } from '@/router/ProtectedRoute';
 import { useLanguageStore, useThemeStore } from '@/stores';
 
-const LoginPage = lazy(() =>
-  import('@/pages/LoginPage').then((mod) => ({ default: mod.LoginPage }))
-);
 const MainLayout = lazy(() =>
   import('@/components/layout/MainLayout').then((mod) => ({ default: mod.MainLayout }))
 );
@@ -18,27 +14,14 @@ function RootShell() {
       <NotificationContainer />
       <ConfirmationModal />
       <Suspense fallback={null}>
-        <Outlet />
+        <MainLayout />
       </Suspense>
     </>
   );
 }
 
 const router = createHashRouter([
-  {
-    element: <RootShell />,
-    children: [
-      { path: '/login', element: <LoginPage /> },
-      {
-        path: '/*',
-        element: (
-          <ProtectedRoute>
-            <MainLayout />
-          </ProtectedRoute>
-        ),
-      },
-    ],
-  },
+  { path: '*', element: <RootShell /> },
 ]);
 
 function App() {

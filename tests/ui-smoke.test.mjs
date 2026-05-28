@@ -46,7 +46,7 @@ function dumpDom(url) {
     [
       '--headless=new',
       '--disable-gpu',
-      '--virtual-time-budget=3000',
+      '--virtual-time-budget=8000',
       '--dump-dom',
       url
     ],
