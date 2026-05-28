@@ -2,15 +2,23 @@ import assert from 'node:assert/strict'
 import { existsSync } from 'node:fs'
 import { request } from 'node:http'
 import { spawn, spawnSync } from 'node:child_process'
+import { fileURLToPath } from 'node:url'
 
-const port = 4180
+const port = 5179
 const edgePath = 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe'
+const projectRoot = fileURLToPath(new URL('../', import.meta.url))
 
 assert.equal(existsSync(edgePath), true, 'Microsoft Edge is required for local UI smoke tests')
 
-const server = spawn(process.execPath, ['scripts/dev-server.mjs'], {
-  cwd: new URL('../', import.meta.url),
-  env: { ...process.env, PORT: String(port) },
+const serverCommand = process.platform === 'win32' ? process.env.ComSpec || 'cmd.exe' : 'npm'
+const serverArgs =
+  process.platform === 'win32'
+    ? ['/d', '/s', '/c', `npm run dev -- --port ${port} --strictPort`]
+    : ['run', 'dev', '--', '--port', String(port), '--strictPort']
+
+const server = spawn(serverCommand, serverArgs, {
+  cwd: projectRoot,
+  env: { ...process.env },
   stdio: 'ignore',
   windowsHide: true
 })
@@ -18,15 +26,14 @@ const server = spawn(process.execPath, ['scripts/dev-server.mjs'], {
 try {
   await waitForServer(`http://localhost:${port}`)
 
-  const folderDom = dumpDom(`http://localhost:${port}`)
+  const folderDom = dumpDom(`http://localhost:${port}/#/account-pool`)
   assert.match(folderDom, /账号池/)
-  assert.match(folderDom, /2026-05-codex/)
-  assert.match(folderDom, /总 Token/)
+  assert.match(folderDom, /文件夹模式/)
+  assert.match(folderDom, /2026-05-codex|codex-user@example\.com-plus\.json/)
 
-  const listDom = dumpDom(`http://localhost:${port}/?mode=list`)
-  assert.match(listDom, /codex-user@example\.com-plus\.json/)
-  assert.match(listDom, /请求大模型/)
-  assert.match(listDom, /17,048/)
+  const rootDom = dumpDom(`http://localhost:${port}`)
+  assert.match(rootDom, /账号池/)
+  assert.doesNotMatch(rootDom, /管理密钥|Management Key|登录到/)
 
   console.log('ui smoke tests passed')
 } finally {

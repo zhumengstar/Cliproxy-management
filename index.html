@@ -1,142 +1,14 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" translate="no" class="notranslate">
   <head>
     <meta charset="UTF-8" />
+    <meta name="google" content="notranslate" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20aria-hidden%3D%22true%22%20role%3D%22img%22%20class%3D%22iconify%20iconify--logos%22%20width%3D%2231.88%22%20height%3D%2232%22%20preserveAspectRatio%3D%22xMidYMid%20meet%22%20viewBox%3D%220%200%20256%20257%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22IconifyId1813088fe1fbc01fb466%22%20x1%3D%22-.828%25%22%20x2%3D%2257.636%25%22%20y1%3D%227.652%25%22%20y2%3D%2278.411%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%2341D1FF%22%3E%3C%2Fstop%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23BD34FE%22%3E%3C%2Fstop%3E%3C%2FlinearGradient%3E%3ClinearGradient%20id%3D%22IconifyId1813088fe1fbc01fb467%22%20x1%3D%2243.376%25%22%20x2%3D%2250.316%25%22%20y1%3D%222.242%25%22%20y2%3D%2289.03%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23FFEA83%22%3E%3C%2Fstop%3E%3Cstop%20offset%3D%228.333%25%22%20stop-color%3D%22%23FFDD35%22%3E%3C%2Fstop%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23FFA800%22%3E%3C%2Fstop%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Cpath%20fill%3D%22url(%23IconifyId1813088fe1fbc01fb466)%22%20d%3D%22M255.153%2037.938L134.897%20252.976c-2.483%204.44-8.862%204.466-11.382.048L.875%2037.958c-2.746-4.814%201.371-10.646%206.827-9.67l120.385%2021.517a6.537%206.537%200%200%200%202.322-.004l117.867-21.483c5.438-.991%209.574%204.796%206.877%209.62Z%22%3E%3C%2Fpath%3E%3Cpath%20fill%3D%22url(%23IconifyId1813088fe1fbc01fb467)%22%20d%3D%22M185.432.063L96.44%2017.501a3.268%203.268%200%200%200-2.634%203.014l-5.474%2092.456a3.268%203.268%200%200%200%203.997%203.378l24.777-5.718c2.318-.535%204.413%201.507%203.936%203.838l-7.361%2036.047c-.495%202.426%201.782%204.5%204.151%203.78l15.304-4.649c2.372-.72%204.652%201.36%204.15%203.788l-11.698%2056.621c-.732%203.542%203.979%205.473%205.943%202.437l1.313-2.028l72.516-144.72c1.215-2.423-.88-5.186-3.54-4.672l-25.505%204.922c-2.396.462-4.435-1.77-3.759-4.114l16.646-57.705c.677-2.35-1.37-4.583-3.769-4.113Z%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CPAMC - 账号池</title>
-    <link rel="stylesheet" href="./src/styles.css" />
+    <title>CLI Proxy API Management Center</title>
   </head>
   <body>
-    <div id="app">
-      <aside class="sidebar" aria-label="主导航">
-        <div class="brand">
-          <div class="brand-mark">CP</div>
-          <strong>CPAMC</strong>
-        </div>
-        <nav class="nav-list">
-          <button class="nav-item"><span class="nav-icon">▦</span>仪表盘</button>
-          <button class="nav-item"><span class="nav-icon">≛</span>配置面板</button>
-          <button class="nav-item"><span class="nav-icon">⌘</span>AI 提供商</button>
-          <button class="nav-item"><span class="nav-icon">◫</span>认证文件</button>
-          <button class="nav-item"><span class="nav-icon">◈</span>OAuth 登录</button>
-          <button class="nav-item"><span class="nav-icon">◷</span>配额管理</button>
-          <button class="nav-item"><span class="nav-icon">☼</span>中心信息</button>
-          <button class="nav-item"><span class="nav-icon">▱</span>使用记录</button>
-          <button class="nav-item is-active"><span class="nav-icon">▤</span>账号池</button>
-          <button class="nav-item"><span class="nav-icon">▧</span>Sub2 转 CPA</button>
-        </nav>
-      </aside>
-
-      <main class="main">
-        <header class="topbar">
-          <button class="collapse-button" aria-label="收起侧栏">‹</button>
-          <div class="top-actions" aria-label="页面操作">
-            <button title="刷新">↻</button>
-            <button title="语言">◎</button>
-            <button title="主题">☼</button>
-            <button title="退出">↱</button>
-          </div>
-        </header>
-
-        <section class="page-head">
-          <div>
-            <h1>账号池</h1>
-            <p>同步所有已导入的账号 JSON，选择后可打包下载。</p>
-          </div>
-          <div class="unchecked-pill">未检测 <strong id="uncheckedCount">0</strong></div>
-        </section>
-
-        <section class="toolbar" aria-label="账号池工具栏">
-          <div class="segmented" role="group" aria-label="视图切换">
-            <button id="listModeBtn" type="button">列表模式</button>
-            <button id="folderModeBtn" type="button" class="is-selected">文件夹模式</button>
-          </div>
-          <div class="tool-group">
-            <span>来源</span>
-            <button id="refreshBtn" type="button">刷新</button>
-            <button id="importBtn" type="button">导入</button>
-            <button id="folderBtn" type="button">文件夹</button>
-          </div>
-          <div class="tool-group">
-            <span>当前范围</span>
-            <strong id="scopeCount">0</strong>
-            <span>筛选</span>
-          </div>
-          <div class="tool-group">
-            <span>处理</span>
-            <button id="checkSelectedBtn" type="button">检测</button>
-            <button id="checkAllBtn" type="button">检测全部</button>
-            <button id="downloadBtn" type="button" class="primary-muted">下载</button>
-          </div>
-          <div class="tool-group danger-group">
-            <span>写回</span>
-            <button id="appendBtn" type="button">追加</button>
-            <button id="overwriteBtn" type="button" class="danger">覆盖</button>
-            <button id="deleteBtn" type="button" class="danger-soft">删除 (<span id="selectedCount">0</span>)</button>
-          </div>
-        </section>
-
-        <section class="filters" aria-label="筛选">
-          <input id="searchInput" type="search" placeholder="搜索文件名、类型或状态" />
-          <select id="folderFilter" aria-label="文件范围">
-            <option value="all">全部文件夹</option>
-          </select>
-          <select id="providerFilter" aria-label="来源模型">
-            <option value="all">全部来源模型</option>
-          </select>
-          <select id="planFilter" aria-label="等级">
-            <option value="all">全部等级</option>
-          </select>
-          <select id="statusFilter" aria-label="状态">
-            <option value="all">全部状态</option>
-          </select>
-          <select id="quotaFilter" aria-label="额度">
-            <option value="all">全部额度</option>
-            <option value="available">有额度</option>
-            <option value="empty">无额度</option>
-          </select>
-          <select id="sortSelect" aria-label="排序">
-            <option value="folderTime">文件夹时间最新</option>
-            <option value="tokens">Token 从高到低</option>
-            <option value="failures">失败数从高到低</option>
-          </select>
-          <label class="compact-field">每页 <input id="pageSize" type="number" value="100" min="1" /></label>
-          <label class="compact-field">并发 <input id="concurrency" type="number" value="2" min="1" /></label>
-        </section>
-
-        <section class="selection-row">
-          <label><input id="selectPage" type="checkbox" /> 选本页</label>
-          <label><input id="selectFiltered" type="checkbox" /> 选择筛选结果</label>
-          <button id="clearSelectionBtn" type="button">清空选择</button>
-          <span id="notice" role="status"></span>
-        </section>
-
-        <section class="metrics-grid" aria-label="统计概览">
-          <article>
-            <span>请求</span>
-            <strong id="metricRequests">0</strong>
-          </article>
-          <article>
-            <span>Token</span>
-            <strong id="metricTokens">0</strong>
-          </article>
-          <article>
-            <span>失败率</span>
-            <strong id="metricFailureRate">0%</strong>
-          </article>
-          <article>
-            <span>P95 延迟</span>
-            <strong id="metricP95">0ms</strong>
-          </article>
-        </section>
-
-        <section class="content-panel">
-          <div id="folderGrid" class="folder-grid" aria-label="文件夹视图"></div>
-          <div id="accountGrid" class="account-grid is-hidden" aria-label="列表视图"></div>
-        </section>
-      </main>
-    </div>
-
-    <script type="module" src="./src/app.js"></script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
