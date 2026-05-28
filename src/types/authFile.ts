@@ -65,6 +65,7 @@ export interface AuthFilesResponse {
     count?: number;
     requests?: number;
     total_tokens?: number;
+    total_usd?: number;
     created_at?: string;
     updated_at?: string;
   }>;

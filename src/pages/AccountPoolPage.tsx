@@ -696,6 +696,21 @@ const formatUSDMetric = (value: number | undefined): string => {
   return `$${usdNumberFormatter.format(value)}`;
 };
 
+const yuanNumberFormatter = new Intl.NumberFormat(undefined, {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+const costPerDollarFormatter = new Intl.NumberFormat(undefined, {
+  minimumFractionDigits: 3,
+  maximumFractionDigits: 3,
+});
+
+const formatCostPerDollarMetric = (value: number | undefined): string => {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) return '-';
+  return `$${costPerDollarFormatter.format(value)}/刀`;
+};
+
 const parseJsonObject = (rawText: string | undefined): Record<string, unknown> | null => {
   if (!rawText) return null;
   try {
@@ -806,6 +821,42 @@ const getUsageMetricForSort = (
   if (!summary) return null;
   const value = summary[key];
   return typeof value === 'number' && Number.isFinite(value) ? value : null;
+};
+
+const readAccountUsageMetric = (
+  file: AuthFileItem,
+  summary: AccountPoolUsageSummary | null,
+  key: 'requests' | 'successes' | 'total_tokens' | 'failures' | 'total_usd'
+): number | undefined => {
+  const entryValue = readFiniteNumber(file[`usage_${key}`]);
+  if (entryValue !== null) return entryValue;
+  const summaryValue = summary?.[key];
+  return typeof summaryValue === 'number' && Number.isFinite(summaryValue) ? summaryValue : undefined;
+};
+
+const getAccountCost = (file: AuthFileItem): number | undefined => {
+  const value = readFiniteNumber(file.account_cost) ?? readFiniteNumber(file.accountCost);
+  return value !== null ? value : undefined;
+};
+
+const getAccountSourceChannel = (file: AuthFileItem): string => {
+  const value = firstNonEmptyString(file.source_channel, file.sourceChannel, file.channel);
+  return value || '-';
+};
+
+const formatAccountLifetime = (file: AuthFileItem): string => {
+  const seconds =
+    readFiniteNumber(file.account_lifetime_seconds) ?? readFiniteNumber(file.accountLifetimeSeconds);
+  const startedAt = firstNonEmptyString(file.account_started_at, file.accountStartedAt);
+  const derivedSeconds = startedAt ? Math.floor((Date.now() - new Date(startedAt).getTime()) / 1000) : null;
+  const totalSeconds = seconds ?? (derivedSeconds && derivedSeconds > 0 ? derivedSeconds : null);
+  if (!totalSeconds || totalSeconds <= 0) return '-';
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  if (days > 0 && hours > 0) return `${days}天${hours}小时`;
+  if (days > 0) return `${days}天`;
+  if (hours > 0) return `${hours}小时`;
+  return '<1小时';
 };
 
 const clampAccountPoolPageSize = (value: number): number =>
@@ -1543,6 +1594,38 @@ export function AccountPoolPage() {
     });
     return totals;
   }, [fileContentCache, files, folderInfos, usageSummaryByAuthID, usageSummaryByEmail]);
+  const folderTotalUsdByName = useMemo(() => {
+    const totals = new Map<string, number>();
+    files.forEach((file) => {
+      const folder = getFileFolder(file);
+      const value =
+        getUsageMetricForSort(
+          file,
+          fileContentCache,
+          usageSummaryByEmail,
+          usageSummaryByAuthID,
+          'total_usd'
+        ) ?? 0;
+      totals.set(folder, (totals.get(folder) ?? 0) + value);
+    });
+    folderInfos.forEach((info) => {
+      const folder = normalizeFolderName(info.folder);
+      const value = readFiniteNumber(info.total_usd);
+      if (value !== null) {
+        totals.set(folder, value);
+      }
+    });
+    return totals;
+  }, [fileContentCache, files, folderInfos, usageSummaryByAuthID, usageSummaryByEmail]);
+  const folderAccountCostByName = useMemo(() => {
+    const totals = new Map<string, number>();
+    files.forEach((file) => {
+      const folder = getFileFolder(file);
+      const value = readFiniteNumber(file.account_cost) ?? readFiniteNumber(file.accountCost) ?? 0;
+      totals.set(folder, (totals.get(folder) ?? 0) + value);
+    });
+    return totals;
+  }, [files]);
   const folderGroups = useMemo(() => {
     const groups = new Map<string, AuthFileItem[]>();
     filteredFiles.forEach((file) => {
@@ -1560,6 +1643,8 @@ export function AccountPoolPage() {
         let unsupported = 0;
         let unknownError = 0;
         let totalTokens = 0;
+        let totalUsd = 0;
+        let accountCost = 0;
         items.forEach((file) => {
           totalTokens +=
             getUsageMetricForSort(
@@ -1569,6 +1654,15 @@ export function AccountPoolPage() {
               usageSummaryByAuthID,
               'total_tokens'
             ) ?? 0;
+          totalUsd +=
+            getUsageMetricForSort(
+              file,
+              fileContentCache,
+              usageSummaryByEmail,
+              usageSummaryByAuthID,
+              'total_usd'
+            ) ?? 0;
+          accountCost += readFiniteNumber(file.account_cost) ?? readFiniteNumber(file.accountCost) ?? 0;
           const result = checkResults[file.name];
           if (result?.status === 'loading') {
             checkingCount += 1;
@@ -1611,6 +1705,8 @@ export function AccountPoolPage() {
             unsupported,
             unknownError,
             totalTokens: folderTotalTokensByName.get(folder) ?? totalTokens,
+            totalUsd: folderTotalUsdByName.get(folder) ?? totalUsd,
+            accountCost: folderAccountCostByName.get(folder) ?? accountCost,
           },
         };
       })
@@ -1634,7 +1730,9 @@ export function AccountPoolPage() {
     fileContentCache,
     filteredFiles,
     folderInfoByName,
+    folderAccountCostByName,
     folderTotalTokensByName,
+    folderTotalUsdByName,
     sortMode,
     usageSummaryByAuthID,
     usageSummaryByEmail,
@@ -2456,6 +2554,13 @@ export function AccountPoolPage() {
       usageSummaryByEmail,
       usageSummaryByAuthID
     );
+    const accountCost = getAccountCost(file);
+    const usageRequests = readAccountUsageMetric(file, usageSummary, 'requests');
+    const usageSuccesses = readAccountUsageMetric(file, usageSummary, 'successes');
+    const usageFailures = readAccountUsageMetric(file, usageSummary, 'failures');
+    const usageTokens = readAccountUsageMetric(file, usageSummary, 'total_tokens');
+    const usageUsd = readAccountUsageMetric(file, usageSummary, 'total_usd');
+    const costPerDollar = accountCost !== undefined && usageUsd && usageUsd > 0 ? accountCost / usageUsd : undefined;
     const planLabel = getPlanLabel(checkResult?.plan);
     const checkedAtLabel = checkResult?.checkedAt
       ? formatUnixTimestamp(Math.round(checkResult.checkedAt / 1000))
@@ -2489,36 +2594,70 @@ export function AccountPoolPage() {
               {planLabel && <span className={styles.planBadge}>{planLabel}</span>}
               {modifiedLabel && <span className={styles.muted}>{modifiedLabel}</span>}
             </div>
+            <div className={styles.accountActionRow}>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => editFolderSourceInfo(getFileFolder(file))}
+              >
+                编辑成本/来源
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => void detectAccounts([file])}
+              >
+                请求大模型
+              </Button>
+            </div>
             <div className={styles.usageMetricRow}>
+              <div className={styles.usageMetric}>
+                <span className={styles.usageMetricLabel}>成本</span>
+                <strong className={styles.usageMetricValue}>
+                  {accountCost !== undefined ? `￥${yuanNumberFormatter.format(accountCost)}` : '-'}
+                </strong>
+              </div>
+              <div className={styles.usageMetric}>
+                <span className={styles.usageMetricLabel}>每刀成本</span>
+                <strong className={styles.usageMetricValue}>{formatCostPerDollarMetric(costPerDollar)}</strong>
+              </div>
+              <div className={styles.usageMetric}>
+                <span className={styles.usageMetricLabel}>渠道来源</span>
+                <strong className={styles.usageMetricValue}>{getAccountSourceChannel(file)}</strong>
+              </div>
+              <div className={styles.usageMetric}>
+                <span className={styles.usageMetricLabel}>存活</span>
+                <strong className={styles.usageMetricValue}>{formatAccountLifetime(file)}</strong>
+              </div>
               <div className={styles.usageMetric}>
                 <span className={styles.usageMetricLabel}>
                   {t('account_pool.usage_requests', { defaultValue: '请求' })}
                 </span>
-                <strong className={styles.usageMetricValue}>{formatUsageMetric(usageSummary?.requests)}</strong>
+                <strong className={styles.usageMetricValue}>{formatUsageMetric(usageRequests)}</strong>
               </div>
               <div className={styles.usageMetric}>
                 <span className={styles.usageMetricLabel}>
                   {t('account_pool.usage_successes', { defaultValue: '成功' })}
                 </span>
-                <strong className={styles.usageMetricValue}>{formatUsageMetric(usageSummary?.successes)}</strong>
+                <strong className={styles.usageMetricValue}>{formatUsageMetric(usageSuccesses)}</strong>
               </div>
               <div className={styles.usageMetric}>
                 <span className={styles.usageMetricLabel}>
                   {t('account_pool.usage_total_tokens', { defaultValue: 'Token' })}
                 </span>
-                <strong className={styles.usageMetricValue}>{formatUsageMetric(usageSummary?.total_tokens)}</strong>
+                <strong className={styles.usageMetricValue}>{formatUsageMetric(usageTokens)}</strong>
               </div>
               <div className={styles.usageMetric}>
                 <span className={styles.usageMetricLabel}>
                   {t('account_pool.usage_total_usd', { defaultValue: '刀数' })}
                 </span>
-                <strong className={styles.usageMetricValue}>{formatUSDMetric(usageSummary?.total_usd)}</strong>
+                <strong className={styles.usageMetricValue}>{formatUSDMetric(usageUsd)}</strong>
               </div>
               <div className={styles.usageMetric}>
                 <span className={styles.usageMetricLabel}>
                   {t('account_pool.usage_failures', { defaultValue: '失败' })}
                 </span>
-                <strong className={styles.usageMetricValue}>{formatUsageMetric(usageSummary?.failures)}</strong>
+                <strong className={styles.usageMetricValue}>{formatUsageMetric(usageFailures)}</strong>
               </div>
             </div>
           </div>
@@ -3103,6 +3242,20 @@ export function AccountPoolPage() {
                     <span className={`${styles.folderStatusPill} ${styles.folderTokenPill}`}>
                       总 Token
                       <strong>{formatUsageMetric(group.stats.totalTokens)}</strong>
+                    </span>
+                    <span className={`${styles.folderStatusPill} ${styles.folderUsdPill}`}>
+                      总刀数
+                      <strong>{formatUSDMetric(group.stats.totalUsd)}</strong>
+                    </span>
+                    <span className={`${styles.folderStatusPill} ${styles.folderCostPill}`}>
+                      每刀成本
+                      <strong>
+                        {formatCostPerDollarMetric(
+                          group.stats.totalUsd > 0
+                            ? group.stats.accountCost / group.stats.totalUsd
+                            : undefined
+                        )}
+                      </strong>
                     </span>
                     {group.stats.checking > 0 && (
                       <span className={`${styles.folderStatusPill} ${styles.folderStatusChecking}`}>

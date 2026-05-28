@@ -917,6 +917,18 @@
   color: var(--success-color);
 }
 
+.folderUsdPill {
+  border-color: color-mix(in srgb, var(--primary-color) 26%, var(--border-color));
+  background: color-mix(in srgb, var(--primary-color) 8%, var(--bg-primary));
+  color: var(--primary-color);
+}
+
+.folderCostPill {
+  border-color: color-mix(in srgb, var(--success-color) 24%, var(--border-color));
+  background: color-mix(in srgb, var(--success-color) 7%, var(--bg-primary));
+  color: var(--success-color);
+}
+
 .folderHeaderActions {
   display: inline-flex;
   align-items: center;
@@ -1036,6 +1048,20 @@
   flex-wrap: wrap;
 }
 
+.accountActionRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  :global(.btn) {
+    min-height: 30px;
+    padding-inline: 10px;
+    font-size: 12px;
+    font-weight: 800;
+  }
+}
+
 .usageMetricRow {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1065,10 +1091,12 @@
 }
 
 .usageMetricValue {
-  flex: 0 0 auto;
+  min-width: 0;
+  overflow: hidden;
   color: var(--text-primary);
   font-size: 13px;
   font-weight: 700;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
