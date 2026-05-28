@@ -1,0 +1,10 @@
+{
+  "id_token": "",
+  "access_token": "eyJhbGciOiJSUzI1NiIs.mock-codex-access-token",
+  "refresh_token": "mock-codex-refresh-token",
+  "account_id": "71319e87-b794-4430-bc81-a6f623e61f56",
+  "last_refresh": "2026-05-26T14:55:18.000Z",
+  "email": "user@example.com",
+  "type": "codex",
+  "expired": "2026-06-04T10:55:42.000Z"
+}

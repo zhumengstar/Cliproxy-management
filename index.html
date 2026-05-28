@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CPAMC - 账号池</title>
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <main class="main">
+        <header class="topbar">
+          <div class="brand">
+            <div class="brand-mark">CP</div>
+            <strong>CPAMC</strong>
+          </div>
+          <div class="top-actions" aria-label="页面操作">
+            <button title="刷新">↻</button>
+            <button title="语言">◎</button>
+            <button title="主题">☼</button>
+            <button title="退出">↱</button>
+          </div>
+        </header>
+
+        <section class="page-head">
+          <div>
+            <h1>账号池</h1>
+            <p>同步所有已导入的账号 JSON，选择后可打包下载。</p>
+          </div>
+          <div class="unchecked-pill">未检测 <strong id="uncheckedCount">0</strong></div>
+        </section>
+
+        <section class="toolbar" aria-label="账号池工具栏">
+          <div class="segmented" role="group" aria-label="视图切换">
+            <button id="listModeBtn" type="button">列表模式</button>
+            <button id="folderModeBtn" type="button" class="is-selected">文件夹模式</button>
+          </div>
+          <div class="tool-group">
+            <span>来源</span>
+            <button id="refreshBtn" type="button">刷新</button>
+            <button id="importBtn" type="button">导入</button>
+            <button id="folderBtn" type="button">文件夹</button>
+          </div>
+          <div class="tool-group">
+            <span>当前范围</span>
+            <strong id="scopeCount">0</strong>
+            <span>筛选</span>
+          </div>
+          <div class="tool-group">
+            <span>处理</span>
+            <button id="checkSelectedBtn" type="button">检测</button>
+            <button id="checkAllBtn" type="button">检测全部</button>
+            <button id="downloadBtn" type="button" class="primary-muted">下载</button>
+          </div>
+          <div class="tool-group danger-group">
+            <span>写回</span>
+            <button id="appendBtn" type="button">追加</button>
+            <button id="overwriteBtn" type="button" class="danger">覆盖</button>
+            <button id="deleteBtn" type="button" class="danger-soft">删除 (<span id="selectedCount">0</span>)</button>
+          </div>
+        </section>
+
+        <section class="filters" aria-label="筛选">
+          <input id="searchInput" type="search" placeholder="搜索文件名、类型或状态" />
+          <select id="folderFilter" aria-label="文件范围">
+            <option value="all">全部文件夹</option>
+          </select>
+          <select id="providerFilter" aria-label="来源模型">
+            <option value="all">全部来源模型</option>
+          </select>
+          <select id="planFilter" aria-label="等级">
+            <option value="all">全部等级</option>
+          </select>
+          <select id="statusFilter" aria-label="状态">
+            <option value="all">全部状态</option>
+          </select>
+          <select id="quotaFilter" aria-label="额度">
+            <option value="all">全部额度</option>
+            <option value="available">有额度</option>
+            <option value="empty">无额度</option>
+          </select>
+          <select id="sortSelect" aria-label="排序">
+            <option value="folderTime">文件夹时间最新</option>
+            <option value="tokens">Token 从高到低</option>
+            <option value="failures">失败数从高到低</option>
+          </select>
+          <label class="compact-field">每页 <input id="pageSize" type="number" value="100" min="1" /></label>
+          <label class="compact-field">并发 <input id="concurrency" type="number" value="2" min="1" /></label>
+        </section>
+
+        <section class="selection-row">
+          <label><input id="selectPage" type="checkbox" /> 选本页</label>
+          <label><input id="selectFiltered" type="checkbox" /> 选择筛选结果</label>
+          <button id="clearSelectionBtn" type="button">清空选择</button>
+          <span id="notice" role="status"></span>
+        </section>
+
+        <section class="metrics-grid" aria-label="统计概览">
+          <article>
+            <span>请求</span>
+            <strong id="metricRequests">0</strong>
+          </article>
+          <article>
+            <span>Token</span>
+            <strong id="metricTokens">0</strong>
+          </article>
+          <article>
+            <span>失败率</span>
+            <strong id="metricFailureRate">0%</strong>
+          </article>
+          <article>
+            <span>P95 延迟</span>
+            <strong id="metricP95">0ms</strong>
+          </article>
+        </section>
+
+        <section class="content-panel">
+          <div id="folderGrid" class="folder-grid" aria-label="文件夹视图"></div>
+          <div id="accountGrid" class="account-grid is-hidden" aria-label="列表视图"></div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,26 @@
+=== REQUEST INFO ===
+Version: main
+URL: /v1/chat/completions
+Method: POST
+Downstream Transport: http
+Timestamp: 2026-05-27T20:11:22+08:00
+
+=== HEADERS ===
+Authorization: Bearer ***
+Content-Type: application/json
+User-Agent: curl/8.16.0
+
+=== REQUEST BODY ===
+{"model":"gpt-5","messages":[{"role":"user","content":"hello"}]}
+
+=== API REQUEST ===
+{"model":"gpt-5","input":[{"role":"user","content":"hello"}]}
+
+=== API RESPONSE ===
+{"id":"resp_abc","usage":{"input_tokens":100,"output_tokens":20,"input_tokens_details":{"cached_tokens":60}}}
+
+=== RESPONSE ===
+Status: 200
+Content-Type: application/json
+
+{"id":"chatcmpl_abc","choices":[{"message":{"role":"assistant","content":"hi"}}],"usage":{"prompt_tokens":100,"completion_tokens":20,"total_tokens":120}}

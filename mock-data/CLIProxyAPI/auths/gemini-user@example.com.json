@@ -1,0 +1,11 @@
+{
+  "type": "gemini",
+  "email": "gemini-user@example.com",
+  "project_id": "my-gcp-project",
+  "token": {
+    "access_token": "ya29.mock-gemini-access-token",
+    "refresh_token": "1//mock-gemini-refresh-token",
+    "expiry": "2026-05-27T22:00:00Z",
+    "token_type": "Bearer"
+  }
+}

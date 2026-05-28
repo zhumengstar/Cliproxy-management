@@ -1,0 +1,33 @@
+{
+  "results": [
+    {
+      "name": "2026-05-codex/codex-user@example.com-plus.json",
+      "content_hash": "sha256:mock-codex-001",
+      "result": {
+        "status": "ok",
+        "message": "plus plan, quota available",
+        "plan": "plus",
+        "quotaLines": ["Plus quota available", "Reset at 2026-05-28T00:00:00+08:00"],
+        "quotaRemainingPercent": 72,
+        "statusCode": 200,
+        "realRequestOk": true,
+        "checkedAt": "2026-05-27T20:18:00+08:00"
+      }
+    },
+    {
+      "name": "2026-05-claude/claude-user@example.com.json",
+      "content_hash": "sha256:mock-claude-001",
+      "result": {
+        "status": "no_quota",
+        "message": "rate_limit_exceeded",
+        "plan": "pro",
+        "quotaLines": ["Rate limited"],
+        "quotaRemainingPercent": 0,
+        "statusCode": 429,
+        "realRequestOk": false,
+        "realRequestError": "rate_limit_exceeded",
+        "checkedAt": "2026-05-27T20:19:00+08:00"
+      }
+    }
+  ]
+}

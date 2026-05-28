@@ -1,0 +1,8 @@
+{
+  "type": "claude",
+  "email": "claude-user@example.com",
+  "access_token": "sk-ant-oat01-mock-claude-access-token",
+  "refresh_token": "mock-claude-refresh-token",
+  "last_refresh": "2026-05-27T10:00:00Z",
+  "expire": "2026-06-01T10:00:00Z"
+}

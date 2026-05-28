@@ -1,0 +1,37 @@
+host: ""
+port: 8317
+
+remote-management:
+  allow-remote: true
+  secret-key: "$2a$10$mocked-secret-key-hash"
+  disable-control-panel: false
+  panel-github-repository: "https://github.com/router-for-me/Cli-Proxy-API-Management-Center"
+
+auth-dir: "/opt/CLIProxyAPI/auths"
+
+api-keys:
+  - "cp_user_a_mock"
+  - "cp_user_b_mock"
+  - "cp_admin_mock"
+
+debug: false
+logging-to-file: true
+usage-statistics-enabled: true
+ws-auth: true
+request-log: true
+
+openai-compat:
+  - name: "openai-main"
+    base-url: "https://api.openai.com/v1"
+    api-key: "sk-openai-main-mock"
+    models:
+      - "gpt-4.1"
+      - "gpt-5"
+
+claude-api-key:
+  - api-key: "sk-ant-claude-direct-mock"
+    base-url: "https://api.anthropic.com"
+
+gemini-api-key:
+  - api-key: "AIza-gemini-direct-mock"
+    base-url: "https://generativelanguage.googleapis.com"

@@ -1,0 +1,26 @@
+=== REQUEST INFO ===
+Version: main
+URL: /v1/chat/completions
+Method: POST
+Downstream Transport: http
+Timestamp: 2026-05-27T16:08:04+08:00
+
+=== HEADERS ===
+Authorization: Bearer ***
+Content-Type: application/json
+User-Agent: node
+
+=== REQUEST BODY ===
+{"model":"gpt-5","messages":[{"role":"user","content":"summarize this report"}]}
+
+=== API REQUEST ===
+{"model":"gpt-5","input":[{"role":"user","content":"summarize this report"}]}
+
+=== API RESPONSE ===
+{"error":{"type":"server_error","message":"upstream_internal_error"}}
+
+=== RESPONSE ===
+Status: 500
+Content-Type: application/json
+
+{"error":{"message":"upstream_internal_error","request_id":"req_codex_004"}}
